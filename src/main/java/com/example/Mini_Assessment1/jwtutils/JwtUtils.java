@@ -1,7 +1,5 @@
-package com.example.Mini_Assessment1.jwtUtils;
+package com.example.Mini_Assessment1.jwtutils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class jwtUtils {
+public class JwtUtils {
 
     @Value("${spring.secret.key}")
     private String SECRET_KEY;

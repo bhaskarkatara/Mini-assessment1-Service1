@@ -2,8 +2,8 @@ package com.example.Mini_Assessment1.controllers;
 
 import com.example.Mini_Assessment1.dataClass.ApiResponse;
 import com.example.Mini_Assessment1.dataClass.User;
-import com.example.Mini_Assessment1.jwtUtils.jwtUtils;
-import com.example.Mini_Assessment1.services.authService;
+import com.example.Mini_Assessment1.jwtutils.JwtUtils;
+import com.example.Mini_Assessment1.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -23,10 +23,10 @@ import java.util.UUID;
 @RestController
 public class FbOAuthController {
     @Autowired
-    private authService AuthService;
+    private AuthService authService;
 
     @Autowired
-    private jwtUtils JwtUtils;
+    private JwtUtils jwtUtils;
 
     private static final BCryptPasswordEncoder PasswordEncoder = new BCryptPasswordEncoder();
 
@@ -76,13 +76,13 @@ public class FbOAuthController {
             String name = userInfo.get("name") != null ? userInfo.get("name").toString() : "No Name";
 
            // Check user in DB
-            Optional<User> existingUser = AuthService.findByEmail(email);
+            Optional<User> existingUser = authService.findByEmail(email);
             if (existingUser.isEmpty()) {
-                AuthService.save(new User(name,email,PasswordEncoder.encode(UUID.randomUUID().toString())));
+                authService.save(new User(name,email,PasswordEncoder.encode(UUID.randomUUID().toString())));
             }
 
             //  Generate JWT
-            String jwt = JwtUtils.generateToken(email);
+            String jwt = jwtUtils.generateToken(email);
 
             //  Redirect back to frontend with token or user info
             String redirectFrontend = "http://localhost:3000/dashboard?token=" + jwt;

@@ -2,10 +2,10 @@ package com.example.Mini_Assessment1.controllers;
 
 import com.example.Mini_Assessment1.dataClass.ApiResponse;
 import com.example.Mini_Assessment1.dataClass.User;
-import com.example.Mini_Assessment1.jwtUtils.jwtUtils;
+import com.example.Mini_Assessment1.jwtutils.JwtUtils;
 
 
-import com.example.Mini_Assessment1.services.authService;
+import com.example.Mini_Assessment1.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -25,10 +25,10 @@ import java.util.UUID;
 public class GoogleOAuthController {
 
     @Autowired
-    private jwtUtils jwtUtils;
+    private JwtUtils jwtUtils;
 
     @Autowired
-    private authService AuthService;
+    private AuthService authService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -98,9 +98,9 @@ try{
 
 
     //  Check user in DB
-    Optional<User> existingUser = AuthService.findByEmail(email);
+    Optional<User> existingUser = authService.findByEmail(email);
     if (existingUser.isEmpty()) {
-        AuthService.save(new User(name,email,PasswordEncoder.encode(UUID.randomUUID().toString())));
+        authService.save(new User(name,email,PasswordEncoder.encode(UUID.randomUUID().toString())));
     }
 
     //  Generate JWT

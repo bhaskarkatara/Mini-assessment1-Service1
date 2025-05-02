@@ -1,6 +1,6 @@
 package com.example.Mini_Assessment1.dataClass;
 
-public class loginDto {
+public class LoginDto {
     public String getEmail() {
         return email;
     }
@@ -9,7 +9,7 @@ public class loginDto {
         this.email = email;
     }
 
-    public loginDto(String email, String password) {
+    public LoginDto(String email, String password) {
         this.email = email;
         this.password = password;
     }

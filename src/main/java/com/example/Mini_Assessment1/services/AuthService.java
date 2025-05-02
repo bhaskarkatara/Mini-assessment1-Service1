@@ -2,13 +2,12 @@ package com.example.Mini_Assessment1.services;
 import com.example.Mini_Assessment1.dataClass.ApiResponse;
 import com.example.Mini_Assessment1.dataClass.OtpDetails;
 import com.example.Mini_Assessment1.dataClass.User;
-import com.example.Mini_Assessment1.dataClass.loginDto;
-import com.example.Mini_Assessment1.jwtUtils.jwtUtils;
-import com.example.Mini_Assessment1.repository.authRepo;
-import com.example.Mini_Assessment1.passwordUtils.passwordUtils;
+import com.example.Mini_Assessment1.dataClass.LoginDto;
+import com.example.Mini_Assessment1.jwtutils.JwtUtils;
+import com.example.Mini_Assessment1.passwordutils.PasswordUtils;
+import com.example.Mini_Assessment1.repository.AuthRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -18,30 +17,30 @@ import java.util.Optional;
 import java.util.Random;
 
 @Service
-public class authService {
+public class AuthService {
 
     @Autowired
-    private authRepo AuthRepo;
+    private AuthRepo authRepo;
 
     @Autowired
-    private passwordUtils PasswordUtils;
+    private PasswordUtils passwordUtils;
 
     @Autowired
-    private jwtUtils JwtUtils;
+    private JwtUtils jwtUtils;
 
     @Autowired
-    private emailService EmailService;
+    private EmailService emailService;
 
     Map<String, OtpDetails> otpStore = new HashMap<>();
 
     public Optional<User> findByEmail(String email) {
-        return AuthRepo.findByEmail(email);
+        return authRepo.findByEmail(email);
     }
 
     public ResponseEntity<?> signupToOtp(User signupRequest) {
         try {
             String userEmail = signupRequest.getEmail();
-            if (AuthRepo.existsByEmail(signupRequest.getEmail())) {
+            if (authRepo.existsByEmail(signupRequest.getEmail())) {
                 throw new RuntimeException("user already exits");
             }
             return generateOtp(userEmail);
@@ -59,20 +58,20 @@ public class authService {
         otpStore.put(email, new OtpDetails(otp, System.currentTimeMillis()));
 
         // Send OTP via email
-        EmailService.sendEmail(email, "Your OTP Code", "Your OTP is: " + otp);
+        emailService.sendEmail(email, "Your OTP Code", "Your OTP is: " + otp);
 
      return ResponseEntity.ok(new ApiResponse<>(200,"Otp Sent Successfully",null));
     }
 
     public void save(User user) {
-        AuthRepo.save(user);
+        authRepo.save(user);
     }
 
 
     public ResponseEntity<?> signup(User signupRequest) {
-        String hashPassword = PasswordUtils.hashPassword(signupRequest.getPassword());
+        String hashPassword = passwordUtils.hashPassword(signupRequest.getPassword());
         User user = new User(new ObjectId(), signupRequest.getName(), signupRequest.getEmail(), hashPassword);
-        AuthRepo.save(user);
+        authRepo.save(user);
         return ResponseEntity.ok(new ApiResponse<>(200,"Signup Successfully",null));
     }
 
@@ -103,16 +102,16 @@ public class authService {
     }
 
 
-    public ResponseEntity<?> login(loginDto loginDto) {
+    public ResponseEntity<?> login(LoginDto loginDto) {
 
         try {
-            User user = AuthRepo.findByEmail(loginDto.getEmail())
+            User user = authRepo.findByEmail(loginDto.getEmail())
                     .orElseThrow(() -> new RuntimeException("user not found"));
 
-            if (!PasswordUtils.matchPassword(loginDto.getPassword(), user.getPassword())) {
+            if (!passwordUtils.matchPassword(loginDto.getPassword(), user.getPassword())) {
                 throw new RuntimeException("Invalid Credentials");
             }
-            String jwt = JwtUtils.generateToken(loginDto.getEmail());
+            String jwt = jwtUtils.generateToken(loginDto.getEmail());
             return ResponseEntity.ok(new ApiResponse<>(200, "Login Successfully", jwt));
 
         } catch (RuntimeException e) {

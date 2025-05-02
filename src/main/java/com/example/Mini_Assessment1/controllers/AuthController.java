@@ -2,31 +2,26 @@ package com.example.Mini_Assessment1.controllers;
 
 import com.example.Mini_Assessment1.dataClass.OtpRequest;
 import com.example.Mini_Assessment1.dataClass.User;
-import com.example.Mini_Assessment1.dataClass.loginDto;
-import com.example.Mini_Assessment1.jwtUtils.jwtUtils;
-import com.example.Mini_Assessment1.services.authService;
+import com.example.Mini_Assessment1.dataClass.LoginDto;
+import com.example.Mini_Assessment1.jwtutils.JwtUtils;
+import com.example.Mini_Assessment1.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/auth")
-public class authController {
-
+public class AuthController {
 
     @Autowired
-    private jwtUtils JwtUtils;
-    @Autowired
-    private authService AuthService;
+    private AuthService authService;
 
     // call this Api when user click for Otp to verify his/her email
     @PostMapping("/signup-to-otp")
      public ResponseEntity<?> signupToOtp(@RequestBody User signUpRequest){
-        return AuthService.signupToOtp(signUpRequest);
+        return authService.signupToOtp(signUpRequest);
     }
 
 
@@ -37,11 +32,11 @@ public class authController {
         if (signupRequest == null) {
           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User data is missing");
         }
-       return AuthService.verifyOtp(otpRequest.getOtp(), otpRequest.getUser());
+       return authService.verifyOtp(otpRequest.getOtp(), otpRequest.getUser());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody loginDto loginRequest){
+    public ResponseEntity<?> login(@RequestBody LoginDto loginRequest){
         return AuthService.login(loginRequest);
     }
 
