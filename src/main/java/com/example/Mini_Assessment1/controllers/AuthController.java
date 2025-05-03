@@ -1,9 +1,9 @@
 package com.example.Mini_Assessment1.controllers;
 
+import com.example.Mini_Assessment1.dataClass.ApiResponse;
 import com.example.Mini_Assessment1.dataClass.OtpRequest;
 import com.example.Mini_Assessment1.dataClass.User;
 import com.example.Mini_Assessment1.dataClass.LoginDto;
-import com.example.Mini_Assessment1.jwtutils.JwtUtils;
 import com.example.Mini_Assessment1.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    // call this Api when user click for Otp to verify his/her email
+    // call this Api when user click for Otp to verify email
     @PostMapping("/signup-to-otp")
      public ResponseEntity<?> signupToOtp(@RequestBody User signUpRequest){
         return authService.signupToOtp(signUpRequest);
@@ -28,7 +28,7 @@ public class AuthController {
   // here comes otp
     @PostMapping("/verifyOtp")
     public ResponseEntity<?> verifyOtp(@RequestBody OtpRequest otpRequest){
-        User signupRequest = otpRequest.getUser(); // null check zaruri
+        User signupRequest = otpRequest.getUser(); // null check
         if (signupRequest == null) {
           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User data is missing");
         }
@@ -37,7 +37,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginRequest){
-        return AuthService.login(loginRequest);
+        if(loginRequest.getPassword().isEmpty() || loginRequest.getEmail().isEmpty()){
+            return ResponseEntity.ok(new ApiResponse<>(400,"please enter your credentials",null));
+        }
+        return authService.login(loginRequest);
     }
 
 }

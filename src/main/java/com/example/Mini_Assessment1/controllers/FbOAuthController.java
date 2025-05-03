@@ -92,7 +92,6 @@ public class FbOAuthController {
 
         }catch (Exception e){
             e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             return ResponseEntity.ok(new ApiResponse<>(500,"Something went wrong",null));
         }
 

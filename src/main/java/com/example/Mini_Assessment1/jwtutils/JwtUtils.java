@@ -35,36 +35,4 @@ public class JwtUtils {
                 .signWith(getSignkey())
                 .compact();
     }
-//    public String extractEmail(String token) {
-//        return extractAllClaims(token).getSubject();
-//    }
-//
-//    public Date extractExpiration(String token) {
-//        return extractAllClaims(token).getExpiration();
-//    }
-//
-//    public boolean validateToken(String token) {
-//        try {
-//            return !isTokenExpired(token);
-//        } catch (JwtException | IllegalArgumentException e) {
-//            return false;
-//        }
-//    }
-//
-//    private boolean isTokenExpired(String token) {
-//        return extractExpiration(token).before(new Date());
-//    }
-//
-//    private Claims extractAllClaims(String token) {
-//        return Jwts.parser()
-//                .verifyWith(getSignkey())
-//                .build()
-//                .parseSignedClaims(token)
-//                .getPayload();
-//    }
-
-//    public boolean validateTokenWithEmail(String token, String email) {
-//        String tokenEmail = extractEmail(token);
-//        return (email.equals(tokenEmail) && validateToken(token));
-//    }
 }

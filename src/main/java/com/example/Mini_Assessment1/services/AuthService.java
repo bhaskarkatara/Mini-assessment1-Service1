@@ -34,13 +34,13 @@ public class AuthService {
     Map<String, OtpDetails> otpStore = new HashMap<>();
 
     public Optional<User> findByEmail(String email) {
-        return authRepo.findByEmail(email);
+        return authRepo.findByEmailIgnoreCase(email);
     }
 
     public ResponseEntity<?> signupToOtp(User signupRequest) {
         try {
             String userEmail = signupRequest.getEmail();
-            if (authRepo.existsByEmail(signupRequest.getEmail())) {
+            if (authRepo.existsByEmailIgnoreCase(signupRequest.getEmail())) {
                 throw new RuntimeException("user already exits");
             }
             return generateOtp(userEmail);
@@ -93,7 +93,9 @@ public class AuthService {
         }
         otpStore.clear();
         // OTP verified – now save user in DB
-
+        if(!checkForEmptyField(signupRequest)){
+            return ResponseEntity.ok(new ApiResponse<>(400,"please enter all details",null));
+        }
         ResponseEntity<?> signupResponse = signup(signupRequest);
 
         String otpResponse = "OTP Verified and ";
@@ -101,11 +103,16 @@ public class AuthService {
         return ResponseEntity.ok(new ApiResponse<>(201, combinedMessage, null));
     }
 
+    public Boolean checkForEmptyField(User signUpRequest){
+        return !signUpRequest.getEmail().isEmpty() &&
+                !signUpRequest.getPassword().isEmpty() &&
+                !signUpRequest.getName().isEmpty();
+    }
 
     public ResponseEntity<?> login(LoginDto loginDto) {
 
         try {
-            User user = authRepo.findByEmail(loginDto.getEmail())
+            User user = authRepo.findByEmailIgnoreCase(loginDto.getEmail())
                     .orElseThrow(() -> new RuntimeException("user not found"));
 
             if (!passwordUtils.matchPassword(loginDto.getPassword(), user.getPassword())) {
@@ -115,7 +122,7 @@ public class AuthService {
             return ResponseEntity.ok(new ApiResponse<>(200, "Login Successfully", jwt));
 
         } catch (RuntimeException e) {
-            return ResponseEntity.ok(new ApiResponse<>(401, "Login Failed", null));
+            return ResponseEntity.ok(new ApiResponse<>(401, e.getMessage(), null));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.ok(new ApiResponse<>(500, "Something went Wrong", e));
