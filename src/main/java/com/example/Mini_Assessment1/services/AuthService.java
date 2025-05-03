@@ -72,7 +72,10 @@ public class AuthService {
         String hashPassword = passwordUtils.hashPassword(signupRequest.getPassword());
         User user = new User(new ObjectId(), signupRequest.getName(), signupRequest.getEmail(), hashPassword);
         authRepo.save(user);
-        return ResponseEntity.ok(new ApiResponse<>(200,"Signup Successfully",null));
+
+        // generate Jwt here
+        String jwt = jwtUtils.generateToken(signupRequest.getEmail());
+        return ResponseEntity.ok(new ApiResponse<>(200,"Signup Successfully",jwt));
     }
 
 
@@ -96,11 +99,7 @@ public class AuthService {
         if(!checkForEmptyField(signupRequest)){
             return ResponseEntity.ok(new ApiResponse<>(400,"please enter all details",null));
         }
-        ResponseEntity<?> signupResponse = signup(signupRequest);
-
-        String otpResponse = "OTP Verified and ";
-        String combinedMessage = otpResponse + signupResponse.getBody();
-        return ResponseEntity.ok(new ApiResponse<>(201, combinedMessage, null));
+        return signup(signupRequest);
     }
 
     public Boolean checkForEmptyField(User signUpRequest){
@@ -118,8 +117,7 @@ public class AuthService {
             if (!passwordUtils.matchPassword(loginDto.getPassword(), user.getPassword())) {
                 throw new RuntimeException("Invalid Credentials");
             }
-            String jwt = jwtUtils.generateToken(loginDto.getEmail());
-            return ResponseEntity.ok(new ApiResponse<>(200, "Login Successfully", jwt));
+            return ResponseEntity.ok(new ApiResponse<>(200, "Login Successfully", null));
 
         } catch (RuntimeException e) {
             return ResponseEntity.ok(new ApiResponse<>(401, e.getMessage(), null));
