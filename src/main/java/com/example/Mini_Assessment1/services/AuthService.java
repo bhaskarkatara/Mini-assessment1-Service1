@@ -45,7 +45,7 @@ public class AuthService {
             }
             return generateOtp(userEmail);
         } catch (Exception e) {
-             return ResponseEntity.ok(new ApiResponse<>(500,"Something went wrong in backend code",e));
+             return ResponseEntity.ok(new ApiResponse<>(401,e.getMessage(),null));
         }
 
     }
